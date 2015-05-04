@@ -7,7 +7,7 @@
 # Distributed under terms of the GPLv3 license.
 
 """
-SLIDe ANimator is a small utility program that puts text on videofiles
+SLIDe animatoR is a small utility program that puts text on videofiles
 """
 
 import json
@@ -67,6 +67,7 @@ def writeToVideo(inputFile,data):
                 }
 
         ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} {filename}".format(**contribDict)
+        #TODO actually run the command
         print(ffmpegcommand)
 
 if __name__ == '__main__':
