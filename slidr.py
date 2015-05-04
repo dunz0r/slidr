@@ -45,7 +45,10 @@ def writeToVideo(inputFile,data):
     encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
 
     for index, contribution in enumerate(data['data']):
-        previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
+        if index != 0:
+            previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
+        else:
+            previousContribution = ""
         contributionId =  contribution[0]
         contributer = contribution[1]
         entryName = contributer + " - " + contribution[2]
