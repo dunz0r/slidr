@@ -70,5 +70,7 @@ def writeToVideo(inputFile,data):
         print(ffmpegcommand)
 
 if __name__ == '__main__':
-    writeToVideo("inputfile",getInfo(sys.argv[1]))
-    #writeToVideo("file.avi", "dunz0r","fläktmodemvalsen","Den här låten har jag gjort")
+    if len(sys.argv) != 2:
+        print("Usage: <input videfile> <json-file>")
+        sys.exit(1)
+    writeToVideo(sys.argv[1],getInfo(sys.argv[2]))
