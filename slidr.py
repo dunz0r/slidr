@@ -74,8 +74,7 @@ def writeToVideo(inputFile,data):
                 }
 
         ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} {filename}".format(**contribDict)
-        #TODO actually run the command
-        print(ffmpegcommand)
+        os.system(ffmpegcommand)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
