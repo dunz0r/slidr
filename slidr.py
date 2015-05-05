@@ -48,7 +48,7 @@ def writeToVideo(inputFile,data):
         if index != 0:
             previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
         else:
-            previousContribution = ""
+            previousContribution = "-"
         contributionId =  contribution[0]
         contributer = contribution[1]
         entryName = contributer + " - " + contribution[2]
@@ -74,7 +74,7 @@ def writeToVideo(inputFile,data):
         print(ffmpegcommand)
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print("Usage: <input videfile> <json-file>")
         sys.exit(1)
     writeToVideo(sys.argv[1],getInfo(sys.argv[2]))
