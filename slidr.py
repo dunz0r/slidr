@@ -14,6 +14,7 @@ import json
 import sys
 import os
 
+
 def getInfo(infoFile):
     """
     Read the information from a json-encoded file and output it
@@ -24,7 +25,10 @@ def getInfo(infoFile):
     data = json.loads(jsonData)
     return data
 
+def shellEscape(s):
+    return s.replace("(","\\(").replace(")","\\)").replace(" ","\\ ")
 """
+    This is the order of the fields in the output
     "fields": [
         "contribution_id",
         "contributer",
@@ -43,9 +47,9 @@ def writeToVideo(inputFile,data):
     """
 
     fontFile = "./arial.ttf"
-    entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile='%s':x=36:y=995:text=" % (fontFile)
-    beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile='%s':x=1337:y=143:text=" % (fontFile)
-    previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile='%s':x=1337:y=70:text=" % (fontFile)
+    entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=36:y=995:text=" % (fontFile)
+    beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1337:y=143:text=" % (fontFile)
+    previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1337:y=70:text=" % (fontFile)
     encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
 
     for index, contribution in enumerate(data['data']):
@@ -59,7 +63,7 @@ def writeToVideo(inputFile,data):
         beamerInfo = contribution[3]
         filename = os.path.splitext(contribution[4])[0] + "-slide.mkv"
         contribDict = {
-                'filename' : filename,
+                'filename' : shellEscape(filename),
                 'inputFile' : inputFile,
                 'id' : contributionId, 
                 'contributer' : contributer, 
@@ -74,6 +78,7 @@ def writeToVideo(inputFile,data):
                 }
 
         ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} {filename}".format(**contribDict)
+        print(ffmpegcommand)
         os.system(ffmpegcommand)
 
 if __name__ == '__main__':
