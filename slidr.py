@@ -47,16 +47,16 @@ def writeToVideo(inputFile,data):
     """
 
     fontFile = "./arial.ttf"
-    entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=36:y=995:text=" % (fontFile)
-    beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1337:y=143:text=" % (fontFile)
-    previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1337:y=70:text=" % (fontFile)
+    entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1100:y=1020:expansion=none:text=" % (fontFile)
+    beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=36:y=1020:expansion=none:text=" % (fontFile)
+    previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=26:y=100:expansion=none:text=" % (fontFile)
     encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
 
     for index, contribution in enumerate(data['data']):
         if index != 0:
             previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
         else:
-            previousContribution = "-"
+            previousContribution = "No previous entry"
         contributionId =  contribution[0]
         contributer = contribution[1]
         entryName = contributer + " - " + contribution[2]
@@ -68,7 +68,7 @@ def writeToVideo(inputFile,data):
                 'id' : contributionId, 
                 'contributer' : contributer, 
                 'entryName' : entryName, 
-                'beamerInfo' : beamerInfo,
+                'beamerInfo' : beamerInfo.replace("%", "\%"),
                 'beamerSettings': beamerSettings,
                 'entryName' : entryName,
                 'entrySettings': entrySettings,
