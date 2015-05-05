@@ -46,6 +46,9 @@ def writeToVideo(inputFile,data):
     data -- json containing all the information
     """
 
+    # A small explanation of what some of the ffmpeg-options do
+    # expansion=none makes it so that no text-expansion happens, all %s and stuff remains unchanged
+    # -c:v libx264 -qp 0 -c:a copy -- codec video x264, don't care about filesize be fast instead, quality profile 0(highest), copy audio stream
     fontFile = "./arial.ttf"
     entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1100:y=1020:expansion=none:text=" % (fontFile)
     beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=36:y=1020:expansion=none:text=" % (fontFile)
@@ -53,10 +56,11 @@ def writeToVideo(inputFile,data):
     encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
 
     for index, contribution in enumerate(data['data']):
+        # This is because the first entry will not have a previous entry
         if index != 0:
             previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
         else:
-            previousContribution = "No previous entry"
+            previousContribution = "-"
         contributionId =  contribution[0]
         contributer = contribution[1]
         entryName = contributer + " - " + contribution[2]
