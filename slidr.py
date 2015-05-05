@@ -14,8 +14,12 @@ import json
 import sys
 import os
 
-# Databas-kommando?
 def getInfo(infoFile):
+    """
+    Read the information from a json-encoded file and output it
+    Keyword arguments:
+    infoFile -- the file with the json-data
+    """
     jsonData= open(infoFile).read()
     data = json.loads(jsonData)
     return data
@@ -34,7 +38,7 @@ def writeToVideo(inputFile,data):
     """
     create a videofile with next, previous and beamerinfo from json data
     Keyword arguments:
-    inputFile -- The file to use as the base
+    inputFile -- The file to use as the base slide
     data -- json containing all the information
     """
 
