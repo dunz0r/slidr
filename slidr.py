@@ -56,7 +56,8 @@ def writeToVideo(inputFile,data):
             "filename",
             "competition_id"
         ]
-    """    for index, contribution in enumerate(data['data']):
+    """
+    for index, contribution in enumerate(data['data']):
         # This is because the first entry will not have a previous entry
         if index != 0:
             previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
