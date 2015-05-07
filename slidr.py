@@ -21,26 +21,27 @@ def getInfo(infoFile):
     Keyword arguments:
     infoFile -- the file with the json-data
     """
+    """
+        This is the order of the fields in the output
+        "fields": [
+            "contribution_id",
+            "contributer",
+            "entry_name",
+            "beamer_info",
+            "filename",
+            "competition_id"
+        ]
+    """
     jsonData= open(infoFile).read()
     data = json.loads(jsonData)
     return data
 
 def shellEscape(s):
     return s.replace("(","\\(").replace(")","\\)").replace(" ","\\ ")
-"""
-    This is the order of the fields in the output
-    "fields": [
-        "contribution_id",
-        "contributer",
-        "entry_name",
-        "beamer_info",
-        "filename",
-        "competition_id"
-    ]
-"""
+
 def writeToVideo(inputFile,data):
     """
-    create a videofile with next, previous and beamerinfo from json data
+    Create a videofile with next, previous and beamerinfo from json data
     Keyword arguments:
     inputFile -- The file to use as the base slide
     data -- json containing all the information
@@ -61,26 +62,18 @@ def writeToVideo(inputFile,data):
             previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
         else:
             previousContribution = "-"
-        contributionId =  contribution[0]
-        contributer = contribution[1]
-        entryName = contributer + " - " + contribution[2]
-        beamerInfo = contribution[3]
-        filename = os.path.splitext(contribution[4])[0] + "-slide.mkv"
         contribDict = {
-                'filename' : shellEscape(filename),
+                'filename' : shellEscape(os.path.splitext(contribution[4])[0] + "-slide.mkv"),
                 'inputFile' : inputFile,
-                'id' : contributionId, 
-                'contributer' : contributer, 
-                'entryName' : entryName, 
-                'beamerInfo' : beamerInfo.replace("%", "\%"),
+                'id' : contribution[0],
+                'entryName' : contributer + " - " + contribution[2],
+                'beamerInfo' : contribution[3].replace("%", "\%"),
                 'beamerSettings': beamerSettings,
-                'entryName' : entryName,
                 'entrySettings': entrySettings,
                 'previousSettings': previousSettings,
                 'previousContribution': previousContribution,
                 'encodingSettings': encodingSettings
                 }
-
         ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} {filename}".format(**contribDict)
         print(ffmpegcommand)
         os.system(ffmpegcommand)
