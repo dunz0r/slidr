@@ -21,17 +21,7 @@ def getInfo(infoFile):
     Keyword arguments:
     infoFile -- the file with the json-data
     """
-    """
-        This is the order of the fields in the output
-        "fields": [
-            "contribution_id",
-            "contributer",
-            "entry_name",
-            "beamer_info",
-            "filename",
-            "competition_id"
-        ]
-    """
+
     jsonData= open(infoFile).read()
     data = json.loads(jsonData)
     return data
@@ -56,7 +46,17 @@ def writeToVideo(inputFile,data):
     previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=26:y=100:expansion=none:text=" % (fontFile)
     encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
 
-    for index, contribution in enumerate(data['data']):
+    """
+        This is the order of the fields in database
+        "fields": [
+            "contribution_id",
+            "contributer",
+            "entry_name",
+            "beamer_info",
+            "filename",
+            "competition_id"
+        ]
+    """    for index, contribution in enumerate(data['data']):
         # This is because the first entry will not have a previous entry
         if index != 0:
             previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
@@ -66,7 +66,7 @@ def writeToVideo(inputFile,data):
                 'filename' : shellEscape(os.path.splitext(contribution[4])[0] + "-slide.mkv"),
                 'inputFile' : inputFile,
                 'id' : contribution[0],
-                'entryName' : contributer + " - " + contribution[2],
+                'entryName' : contribution[1] + " - " + contribution[2],
                 'beamerInfo' : contribution[3].replace("%", "\%"),
                 'beamerSettings': beamerSettings,
                 'entrySettings': entrySettings,
