@@ -41,7 +41,7 @@ def writeToVideo(inputFile,data):
     # expansion=none makes it so that no text-expansion happens, all %s and stuff remains unchanged
     # -c:v libx264 -qp 0 -c:a copy -- codec video x264, don't care about filesize be fast instead, quality profile 0(highest), copy audio stream
     fontFile = "./arial.ttf"
-    entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=900:y=1020:expansion=none:text=" % (fontFile)
+    entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1050:y=1040:expansion=none:text=" % (fontFile)
     beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=36:y=1020:expansion=none:text=" % (fontFile)
     previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=26:y=100:expansion=none:text=" % (fontFile)
     encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
@@ -57,25 +57,25 @@ def writeToVideo(inputFile,data):
             "competition_id"
         ]
     """
-    for index, contribution in enumerate(data['data']):
+    for index, contribution in enumerate(data):
         # This is because the first entry will not have a previous entry
         if index != 0:
-            previousContribution = data['data'][index - 1][1] + " - " + data['data'][index - 1][2]
+            previousContribution = data[index - 1]['contributer'] + " - " + data[index - 1]['entry_name']
         else:
             previousContribution = "-"
         contribDict = {
-                'filename' : shellEscape(os.path.splitext(str(index) + "-" + str(contribution[1]) + "-" + contribution[2])[0] + "-slide.mkv"),
+                'filename' : shellEscape(os.path.splitext(str(index) + "-" + str(contribution['contributer']) + "-" + contribution['entry_name'])[0] + "-slide.mkv"),
                 'inputFile' : inputFile,
-                'id' : contribution[0],
-                'entryName' : contribution[1] + " - " + contribution[2],
-                'beamerInfo' : contribution[3].replace("%", "\%"),
+                'id' : contribution['contribution_id'],
+                'entryName' : contribution['contributer'] + " - " + contribution['entry_name'],
+                'beamerInfo' : contribution['beamer_info'].replace("%", "\%"),
                 'beamerSettings': beamerSettings,
                 'entrySettings': entrySettings,
                 'previousSettings': previousSettings,
                 'previousContribution': previousContribution,
                 'encodingSettings': encodingSettings
                 }
-        ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} {filename}".format(**contribDict)
+        ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} \"{filename}\"".format(**contribDict)
         os.system(ffmpegcommand)
 
 if __name__ == '__main__':
