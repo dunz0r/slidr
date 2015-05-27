@@ -66,6 +66,7 @@ def writeToVideo(inputFile,data):
         contribDict = {
                 'filename' : shellEscape(os.path.splitext(str(index) + "-" + str(contribution['contributer']) + "-" + contribution['entry_name'])[0] + "-slide.mkv"),
                 'inputFile' : inputFile,
+                'contribFilename': contribution['filename'],
                 'id' : contribution['contribution_id'],
                 'entryName' : contribution['contributer'] + " - " + contribution['entry_name'],
                 'beamerInfo' : contribution['beamer_info'].replace("%", "\%"),
