@@ -14,6 +14,7 @@ import json
 import yaml
 import sys
 import os
+import re
 
 
 
@@ -80,7 +81,6 @@ def writeToImage(inputFile,data):
 				'beamerSettings' : '-annotate %s -pointsize %s' % (config['beamerSize'], config['beamerPos']),
 				'previousSettings' : '-annotate %s -pointsize %s' % (config['previousSize'], config['previousPos'])
 				}
-		#imagemagickcommand="convert input.png -gravity North -pointsize 30 -fill white -annotate +1050+1040 '{entryName}' -annotate +36+1020 '{beamerInfo}' -annotate +26+100 '{previousContribution}' {filename}".format(**contribDict)
 		imagemagickcommand="convert {inputFile} -fill white {entrySettings} '{entryName}' {groupSettings} 'by {group}' {beamerSettings} '{beamerInfo}' {previousContribution} '{previousContribution}' {index}-slide-{filename}".format(**contribDict)
 		# Makes overlay
 		print(imagemagickcommand)
