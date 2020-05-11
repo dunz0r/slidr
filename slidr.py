@@ -7,12 +7,14 @@
 # Distributed under terms of the GPLv3 license.
 
 """
-SLIDe animatoR is a small utility program that puts text on videofiles
+SLIDe animatoR is a small utility program that makes images from json-input
 """
 
 import json
+import yaml
 import sys
 import os
+
 
 
 def getInfo(infoFile):
@@ -29,7 +31,12 @@ def getInfo(infoFile):
 def shellEscape(s):
 	return s.replace("(","\\(").replace(")","\\)").replace(" ","\\ ")
 
-def writeToVideo(inputFile,data):
+def readConfig():
+	with open(r'slidr.yml') as file:
+			configuration = yaml.load(file, Loader=yaml.FullLoader)
+	return configuration
+
+def writeToImage(inputFile,data):
 	"""
 	Create a videofile with next, previous and beamerinfo from json data
 	Keyword arguments:
@@ -37,19 +44,10 @@ def writeToVideo(inputFile,data):
 	data -- json containing all the information
 	"""
 
-	# A small explanation of what some of the ffmpeg-options do
-	# expansion=none makes it so that no text-expansion happens, all %s and stuff remains unchanged
-	# -c:v libx264 -qp 0 -c:a copy -- codec video x264, don't care about filesize be fast instead, quality profile 0(highest), copy audio stream
-	fontFile = "./arial.ttf"
-	entrySettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=1050:y=1040:expansion=none:text=" % (fontFile)
-	beamerSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=36:y=1020:expansion=none:text=" % (fontFile)
-	previousSettings = "drawtext=fontsize=30:fontcolor=0xFFFFFFFF:shadowcolor=0x000000EE:shadowx=2:shadowy=2:fontfile=%s:x=26:y=100:expansion=none:text=" % (fontFile)
-	encodingSettings = "-c:v libx264 -preset ultrafast -qp 0 -c:a copy "
-
 	"""
 		This is the order of the fields in database
 		"fields": [
-			"contribution_id",
+			"id",
 			"contributer",
 			"entry_name",
 			"beamer_info",
@@ -57,30 +55,38 @@ def writeToVideo(inputFile,data):
 			"competition_id"
 		]
 	"""
+	
+	config = readConfig()
+	print(config['entrySize'])
 	for index, contribution in enumerate(data):
 		# This is because the first entry will not have a previous entry
 		if index != 0:
-			previousContribution = data[index - 1]['contributer'] + " - " + data[index - 1]['entry_name']
+			previousContribution = "Previous Entry:" + data[index - 1]['group'] + " - " + data[index - 1]['name']
 		else:
-			previousContribution = "-"
+			previousContribution = " "
 		contribDict = {
-				'filename' : shellEscape(os.path.splitext(str(index) + "-" + str(contribution['contributer']) + "-" + contribution['entry_name'])[0] + "-slide.mkv"),
+				'filename' : contribution['filename'].replace("zip","png"),
 				'inputFile' : inputFile,
 				'contribFilename': contribution['filename'],
-				'id' : contribution['contribution_id'],
-				'entryName' : contribution['contributer'] + " - " + contribution['entry_name'],
-				'beamerInfo' : contribution['beamer_info'].replace("%", "\%"),
-				'beamerSettings': beamerSettings,
-				'entrySettings': entrySettings,
-				'previousSettings': previousSettings,
+				'id' : contribution['id'],
+				'entryName' : contribution['name'],
+				'group' : contribution['group'],
+				'beamerInfo' : contribution['info'].replace("%", "\%"),
 				'previousContribution': previousContribution,
-				'encodingSettings': encodingSettings
+				'inputFile' : inputFile,
+				'index' : str(index),
+				'entrySettings' : '-annotate %s -pointsize %s' % (config['entrySize'], config['entryPos']),
+				'groupSettings' : '-annotate %s -pointsize %s' % (config['groupSize'], config['groupPos']),
+				'beamerSettings' : '-annotate %s -pointsize %s' % (config['beamerSize'], config['beamerPos']),
+				'previousSettings' : '-annotate %s -pointsize %s' % (config['previousSize'], config['previousPos'])
 				}
-		ffmpegcommand = "ffmpeg -threads 8 -i {inputFile} -vf \"[in]{entrySettings}{entryName}, {beamerSettings}{beamerInfo}, {previousSettings}{previousContribution}\" {encodingSettings} \"{filename}\"".format(**contribDict)
-		os.system(ffmpegcommand)
+		#imagemagickcommand="convert input.png -gravity North -pointsize 30 -fill white -annotate +1050+1040 '{entryName}' -annotate +36+1020 '{beamerInfo}' -annotate +26+100 '{previousContribution}' {filename}".format(**contribDict)
+		imagemagickcommand="convert {inputFile} -fill white {entrySettings} '{entryName}' {groupSettings} 'by {group}' {beamerSettings} '{beamerInfo}' {previousContribution} '{previousContribution}' {index}-slide-{filename}".format(**contribDict)
+		# Makes overlay
+		print(imagemagickcommand)
 
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
-		print("Usage: <input videfile> <json-file>")
+		print("Usage: <json-file>")
 		sys.exit(1)
-	writeToVideo(sys.argv[1],getInfo(sys.argv[2]))
+	writeToImage(sys.argv[1],getInfo(sys.argv[2]))
